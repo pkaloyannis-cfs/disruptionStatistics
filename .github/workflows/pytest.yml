@@ -1,0 +1,24 @@
+# File sourced from: https://jacobian.org/til/github-actions-poetry/ with small modifications
+name: Python Unit Tests
+
+on: push
+
+jobs:
+  pytest:
+    name: Python Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Switch to Current Branch
+        run: git checkout ${{ env.BRANCH }}
+
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        id: python-setup
+        uses: ./.github/actions/setup_python
+
+      # And finally run tests. I'm using pytest and all my pytest config is in my `pyproject.toml`
+      # so this line is super-simple. But it could be as complex as you need.
+      - run: poetry run pytest
