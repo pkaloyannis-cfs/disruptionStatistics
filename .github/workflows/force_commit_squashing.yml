@@ -1,0 +1,28 @@
+name: 'Force Commit Squashing'
+
+on:
+  pull_request:
+    types: [edited, opened, reopened, synchronize]
+
+jobs:
+  commit-squashing:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Check Number of New Commits
+        run: |
+          echo "Checking the number of commits introduced by the branch..."
+          export NUM_COMMITS=$(git rev-list --oneline HEAD ^origin/main | wc -l | xargs)
+          export CURRENT_BRANCH=$(git branch --show-current)
+          # We check for at most 2 commits instead of 1 as the checkout action introduces
+          # a merge commit prior to our commits. This extra commit is only present while
+          # the job is running.
+          if [[ $NUM_COMMITS > 2 ]]; then
+            echo "There are $((${NUM_COMMITS} - 1)) commits introduced by this branch."
+            echo "Commits must be squashed prior to merge."
+            exit 1
+          else
+            echo "Commits have been squashed."
+          fi

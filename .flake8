@@ -1,0 +1,9 @@
+[flake8]
+max-line-length = 90
+
+# E203: is a common thing to ignore as it removes whitespace before colons
+#       in a non pep8 way.
+# F821: gives "undefined name" for every add_module(...), add_constant(..) in neutrino
+# E127: I think violates too much of current code style, is an error for continuation
+# 		line over-indented for visual indent
+extend-ignore = E203, F821, E127
