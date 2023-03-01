@@ -18,7 +18,10 @@ Finally, to ensure the code will work properly, feel free to run the unit tests.
 ```
 poetry run pytest
 ```
-If all those pass, you are ready to take on the world!
+If all those pass, you are ready to take on the world! Generating documentation is easy after this step, run the line below and click on the link to view docs!
+```
+mkdocs serve
+```
 
 ## For Developers
 
