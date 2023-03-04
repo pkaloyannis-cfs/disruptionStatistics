@@ -20,7 +20,7 @@ poetry run pytest
 ```
 If all those pass, you are ready to take on the world! Generating documentation is easy after this step, run the line below and click on the link to view docs!
 ```
-mkdocs serve
+poetry run mkdocs serve
 ```
 
 ## For Developers
