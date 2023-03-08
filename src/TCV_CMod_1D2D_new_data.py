@@ -82,7 +82,7 @@ def read_data_CMod():
     tritop = cmod.DELTA_TOP
     tribot = cmod.DELTA_BOTTOM
     aminor = cmod.aminor
-    rmajor = cmod.Rmajor
+    rmajor = cmod.sx
     aspect_ratio = rmajor / aminor
     overall_tri = (tribot + tritop) / 2
     # add columns

@@ -1,17 +1,21 @@
-# Welcome to MkDocs
+# Welcome to Disruption Statistics
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
-
-## Commands
-
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+Disruption Statistics is a software package by Panagiotis Kaloyannis for exploring the operational spaces of tokamaks and producing disruptivity maps.
+This documentation page will be filled out more in the future. 😃
 
 ## Project layout
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+    .flake8                         # The linter configuration file.
+    .pre-commit-config.yaml         # The pre-commit hooks.
+    .gitignore                      # Git Ignore
+    .github/                        # Git Actions
+    mkdocs.yml                      # The documentation configuration file.
+    conftest.py                     # Global Unit test configuation.
+    poetry.lock                     # Poetry Lock File
+    pyproject.toml                  # Poetry TOML File
+    README.md                       # The Repository README.
+    docs/                           # Documentation Directory
+    src/                            # Source Code Directory
+        vis/                        # Visualization Package
+    tests/                          # Unit Test Directory
+

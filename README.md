@@ -22,6 +22,10 @@ If all those pass, you are ready to take on the world! Generating documentation 
 ```
 poetry run mkdocs serve
 ```
+Alternatively, you could build the website and browse it freely.
+```
+poetry run mkdocs build
+```
 
 ## For Developers
 
