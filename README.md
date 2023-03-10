@@ -26,6 +26,7 @@ Alternatively, you could build the website and browse it freely.
 ```
 poetry run mkdocs build
 ```
+To get the data used for data manipulation, consider looking at the `.mat` files found in [this google drive](https://drive.google.com/drive/folders/1ZeCJhrHs7nmj6mKEgLdV-hCJNjFZb2kk).
 
 ## For Developers
 

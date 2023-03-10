@@ -1,4 +1,5 @@
 site_name: Disruption Statistics
+repo_url: https://github.com/pkaloyannis-cfs/disruptionStatistics
 theme:
   name: material
   palette: 
@@ -15,3 +16,25 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+
+plugins:
+  # Docstring Source: https://chrieke.medium.com/documenting-a-python-package-with-code-reference-via-mkdocs-material-b4a45197f95b
+  - search
+  - mkdocstrings
+
+  # # Notebook Source:
+  # - mkdocs-jupyter:
+  #     include: ["*.ipynb"]
+  #     execute: True
+  #     theme: dark
+  #     include_source: True
+
+# nav:
+#   - Introduction: 'index.md'
+#   - Source:
+#     - src/data_loader.py: 'Source/data_loader.md'
+#     - src/disruptivity.py: 'Source/disruptivity_ref.md'
+#     - Visualization:
+#       - src/vis/disruptivity_vis.py: Source/vis/disruptivity_vis_ref.md
+#   - Notebooks:
+#     - Test Notebook: "notebooks/test.ipynb"

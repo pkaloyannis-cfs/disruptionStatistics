@@ -1,5 +1,29 @@
 repos:
-  - repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: 'v2.0.0'
+  - repo: local
     hooks:
-      - id: autopep8
+      # https://zhauniarovich.com/post/2020/2020-06-clearing-jupyter-output/
+      - id: jupyter-nb-clear-output
+        name: jupyter-nb-clear-output
+        files: \.ipynb$
+        stages: [commit]
+        language: system
+        entry: poetry run jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace
+
+      # Linter
+      - id: black
+        name: black
+        entry: poetry run python3 -m black
+        language: system
+        args: ['--line-length=80', '--preview']
+        files: '\.py?$' # Python regex for *.py files
+
+      # Black doesn't support formatting docstrings.. so yet another tool!
+      # https://stackoverflow.com/questions/70966298/python-black-code-formatter-doesnt-format-docstring-line-length
+      - id: docformatter
+        name: docformatter
+        entry: poetry run python3 -m docformatter .
+        language: system
+        # Defaults are 79 and 72, but I like having 100 column lines cause I'm that way.
+        args: ['-r', '--in-place', '--wrap-summaries', '99', '--wrap-descriptions', '92']
+        files: '\.py?$' # Python regex for *.py files
+        pass_filenames: false
