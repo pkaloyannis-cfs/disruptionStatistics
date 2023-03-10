@@ -15,7 +15,7 @@ runs:
     - name: Python Setup
       uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: "3.9"
 
     # Cache the installation of Poetry itself, e.g. the next step. This prevents the workflow
     # from installing Poetry every time, which can be slow. Note the use of the Poetry version

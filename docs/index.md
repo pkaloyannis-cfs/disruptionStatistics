@@ -5,7 +5,6 @@ This documentation page will be filled out more in the future. 😃
 
 ## Project layout
 
-    .flake8                         # The linter configuration file.
     .pre-commit-config.yaml         # The pre-commit hooks.
     .gitignore                      # Git Ignore
     .github/                        # Git Actions
@@ -18,4 +17,5 @@ This documentation page will be filled out more in the future. 😃
     src/                            # Source Code Directory
         vis/                        # Visualization Package
     tests/                          # Unit Test Directory
+    notebooks/                      # Jupyter Notebook Directory
 

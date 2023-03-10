@@ -1,4 +1,4 @@
-name: Super-Linter
+name: Pre-Commit Hooks
 
 on: push
 
@@ -11,7 +11,7 @@ jobs:
       id: python-setup
       uses: ./.github/actions/setup_python
 
-    - name: Python format
+    - name: Hooks
       uses: pre-commit/action@v3.0.0
       with:
         extra_args: --all-files
