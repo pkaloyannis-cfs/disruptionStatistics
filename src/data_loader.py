@@ -26,6 +26,10 @@ def load_disruptions_mat(filepath: str):
     data.pop("__version__")
     data.pop("__globals__")
 
+    #! TODO: Discuss what these skipped keys are
+    # Skipped Keys -- For DIII-D Data
+    skipped_keys = ["iperr", "ipprog"]
+
     # Get the Key list
     key_list = list(data.keys())
 
@@ -42,6 +46,10 @@ def load_disruptions_mat(filepath: str):
         # Index Extraction
         if "indices" in key:
             index_dict[key] = data.pop(key) - 1
+
+        # Skip the skipped keys
+        if key in skipped_keys:
+            data.pop(key)
 
     # Create the Pandas DataFrame
     data_df = pd.DataFrame.from_dict(data)
