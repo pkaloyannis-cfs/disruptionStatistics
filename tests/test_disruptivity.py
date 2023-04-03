@@ -9,103 +9,155 @@ import disruptivity
 @pytest.fixture
 def gen_dataframe_and_indices():
     # Create the data frame
-    CONFIG = {"elem1": [0] + [1] * 5 + [2] * 3 + [3]}
+    CONFIG = {
+        "elem1": [0] + [1] * 5 + [2] * 3 + [3],
+        "elem2": [0] + [1] * 5 + [2] * 3 + [3],
+        "time": np.arange(10),
+        "shot": [1] * 10,
+    }
+
     dataframe = pd.DataFrame.from_dict(CONFIG)
 
     # Indices - 1x0, 2x1, 2x2, 1x3
-    indicies = [0, 1, 5, 6, 7, 9]
+    indices = [0, 1, 5, 6, 7, 9]
 
-    return dataframe, indicies
+    # Create the entry_dict
+    entry_dict = {
+        "elem1": {"range": [-0.5, 3.5]},
+        "elem2": {"range": [-0.5, 3.5]},
+    }
+
+    return dataframe, indices, entry_dict
 
 
-def test_indices_to_histogram1d(gen_dataframe_and_indices):
+def test_indices_to_histogram(gen_dataframe_and_indices):
     # Unpack the fixture
-    dataframe, indices = gen_dataframe_and_indices
+    dataframe, indices, entry_dict = gen_dataframe_and_indices
 
-    # Compute the histogram
-    x_range = [-0.5, 3.5]
-
-    # Compute the histogram
-    hist = disruptivity.indices_to_histogram1d(
-        dataframe["elem1"], x_range, indices, x_nbins=4
-    )
-
-    # Asserts
-    assert (hist[0] == [1, 2, 2, 1]).all(), "Incorrect Histogram Calculation"
-    assert (
-        hist[1] == [-0.5, 0.5, 1.5, 2.5, 3.5]
-    ).all(), "Incorrect Bin Calculation"
-
-
-def test_indices_to_histogram2d(gen_dataframe_and_indices):
-    # Unpack the fixture
-    dataframe, indices = gen_dataframe_and_indices
-
-    # Compute the histogram
-    x_range = [-0.5, 3.5]
-
-    # Compute the histogram
-    hist = disruptivity.indices_to_histogram2d(
-        dataframe["elem1"],
-        dataframe["elem1"],
-        x_range,
-        x_range,
-        indices,
-        x_nbins=4,
-        y_nbins=4,
+    # Compute the histogram general dimension case
+    hist_2d = disruptivity.indices_to_histogram(
+        dataframe, entry_dict, indices, nbins=4
     )
 
     result = np.diag([1, 2, 2, 1])
 
     # # Asserts
-    assert (hist[0] == result).all(), "Incorrect Histogram Calculation"
     assert (
-        hist[1] == [-0.5, 0.5, 1.5, 2.5, 3.5]
+        hist_2d.statistic == result
+    ).all(), "Incorrect Histogram Calculation"
+    assert (
+        hist_2d.bin_edges[0] == [-0.5, 0.5, 1.5, 2.5, 3.5]
     ).all(), "Incorrect Bin Calculation"
     assert (
-        hist[2] == [-0.5, 0.5, 1.5, 2.5, 3.5]
+        hist_2d.bin_edges[1] == [-0.5, 0.5, 1.5, 2.5, 3.5]
+    ).all(), "Incorrect Bin Calculation"
+
+    # The special 1D case.
+    entry_dict.pop("elem2")
+    # Compute the histogram general dimension case
+    hist_1d = disruptivity.indices_to_histogram(
+        dataframe, entry_dict, indices, nbins=4
+    )
+
+    # Asserts
+    assert (
+        hist_1d.statistic == [1, 2, 2, 1]
+    ).all(), "Incorrect Histogram Calculation"
+    assert (
+        hist_1d.bin_edges[0] == [-0.5, 0.5, 1.5, 2.5, 3.5]
     ).all(), "Incorrect Bin Calculation"
 
 
-def test_compute_disruptivity():
-    # Bins
-    num_val = np.array([0, 1, 2, 1, 0])
-    denom_val = np.array([1, 1, 0, 1, 1])
-    bins = np.array([0, 1, 2, 3, 4, 5])
-    disrupt_result = np.array([0, 1, 0, 1, 0])
-    error_result = np.array([0, np.sqrt(2), 0, np.sqrt(2), 0])
+def test_compute_variable_time_array(gen_dataframe_and_indices):
+    # Unpack the fixture and prep variables
+    dataframe, indices, entry_dict = gen_dataframe_and_indices
+    nbins = 4
+    denom_dd = disruptivity.indices_to_histogram(
+        dataframe, entry_dict, indices, nbins
+    )
+
+    # The first test is the mapping test, that is
+    # given a denom histogram, if dt=1 everywhere
+    # match the statistics.
+    dt_array = disruptivity.compute_variable_time(
+        dataframe, denom_dd, indices, nbins
+    )
+
+    # Fill the last time slice, since no dt can be computed for it
+    dt_array[-1, -1] += 1
+
+    assert (
+        dt_array == denom_dd.statistic
+    ).all(), "Incorect Variable Timestep Mapping or Calculation"
+
+    # The next test is the out of bounds test
+    # When histogram entries are out of bounds
+    # They should be ignored.
+    dataframe["elem1"][0] = -1
+    denom_dd = disruptivity.indices_to_histogram(
+        dataframe, entry_dict, indices, nbins
+    )
+    dt_array = disruptivity.compute_variable_time(
+        dataframe, denom_dd, indices, nbins
+    )
+    dataframe["elem1"][0] = 0
+
+    # Fill the last time slice, since no dt can be computed for it
+    dt_array[-1, -1] += 1
+
+    assert (dt_array == denom_dd.statistic).all(), "Incorrect Boundary Handling"
+
+    # The next test is shot number transition test.
+    # On a shot number transition, we expect to ignore
+    # that dt since it cannot be computed.
+    dataframe["shot"] = [1] * 6 + [2] * 4
+    denom_dd = disruptivity.indices_to_histogram(
+        dataframe, entry_dict, indices, nbins
+    )
+    dt_array = disruptivity.compute_variable_time(
+        dataframe, denom_dd, indices, nbins
+    )
+
+    # Fill the last time slice, since no dt can be computed for it
+    dt_array[-1, -1] += 1
+
+    # Fill the [1,1] index corresponding to missing 1 in the summation.
+    dt_array[1, 1] += 1
+
+    assert (
+        dt_array == denom_dd.statistic
+    ).all(), "Incorrect Shot Transition Handling"
+
+    return
+
+
+def test_compute_disruptivity(gen_dataframe_and_indices):
+    # Unpack the fixture
+    dataframe, indices, entry_dict = gen_dataframe_and_indices
+
+    # 1x0 5x1 3x2 1x3
+    indices_2 = np.arange(0, 10)
+
+    # The answers to the fixed time tests
+    num_val = np.array([1, 2, 2, 1])
+    denom_val = np.array([1, 5, 3, 1])
+    disrupt_result = num_val / denom_val
+    error_result = disrupt_result * np.sqrt(
+        [2, 1 / 2 + 1 / 5, 1 / 2 + 1 / 3, 2]
+    )
     dt = 1
 
-    # Test the 1D Case
-    # Numerator and Denominator 1D
-    num1d = [num_val, bins]
-    denom1d = [denom_val, bins]
-    result1d = [disrupt_result, error_result]
+    entry_dict.pop("elem2")
 
-    # Compute
-    disrupt1d = disruptivity.compute_disruptivity(num1d, denom1d, dt)
+    # Compute the fixed time 1D dirsuptivity
+    disrupt1d, errors1d, bin_edges_1d = disruptivity.compute_disruptivity(
+        dataframe, entry_dict, indices, indices_2, nbins=4, dt=dt
+    )
 
     # Test
     assert (
-        result1d[0] == disrupt1d[0]
+        disrupt1d == disrupt_result
     ).all(), "Error in 1D Disruptivity: Bad Disruptivity."
     assert (
-        result1d[1] == disrupt1d[1]
+        errors1d == error_result
     ).all(), "Error in 1D Disruptivity: Bad Error."
-
-    # Test the 2D Case
-    # Numerator and Denominator 2D
-    num2d = [np.diag(num_val), bins, bins]
-    denom2d = [np.diag(denom_val), bins, bins]
-    result2d = [np.diag(disrupt_result), np.diag(error_result)]
-
-    # Compute
-    disrupt2d = disruptivity.compute_disruptivity(num2d, denom2d, dt)
-
-    # Test
-    assert (
-        result2d[0] == disrupt2d[0]
-    ).all(), "Error in 2D Disruptivity: Bad Disruptivity."
-    assert (
-        result2d[1] == disrupt2d[1]
-    ).all(), "Error in 2D Disruptivity: Bad Error."
