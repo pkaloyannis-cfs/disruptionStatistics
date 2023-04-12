@@ -3,6 +3,7 @@ maps."""
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import colors
 from vis.plot_helpers import *
 
 # TODO: Potentially fix the duplication of code between disruptivity1D and disruptivity2D when we introduce classes.
@@ -16,6 +17,7 @@ def subplot_disruptivity1d(
     disruptivity: np.ndarray,
     error: np.ndarray,
     bins: np.ndarray,
+    entry_dict: dict,
 ):
     """Creates a subplot of a 1D disruptivity map.
 
@@ -23,23 +25,37 @@ def subplot_disruptivity1d(
         ax (subplot_type): The matplotlib axes to plot on.
         disruptivity (np.ndarray): The disruptivity histogram of size (n_bins-1).
         error (np.ndarray): The error histogram of size (n_bins-1).
-        bins (np.ndarray): The bin array of size (nbins).
+        bins (list): The list of bin arrays of size (nbins).
+        entry_dict (list): List of the entries being plotted.
     """
 
     # Asserts to ensure these are the correct bins and arrays
-    assert len(disruptivity) + 1 == len(bins), (
+    assert len(disruptivity) + 1 == len(bins[0]), (
         "Bin and Disruptivity array size mismatch. Expected bin size:"
-        f" {len(disruptivity)+1}, Actual bin size: {len(bins)}"
+        f" {len(disruptivity)+1}, Actual bin size: {len(bins[0])}"
     )
     assert len(disruptivity) == len(error), (
         "Error and Disruptivity array size mismatch. disruptivity size:"
         f" {len(disruptivity)}, error Size: {len(error)}"
     )
+    assert len(entry_dict) == 1, "Too many entry_dict dimensions."
+
+    # Get the limits and the axis name
+    entry = entry_dict[list(entry_dict)[0]]
+
+    assert "range" in entry, f"Entry {key} of entry_dict missing range field."
+    ax.set_xlim(*entry["range"])
+
+    # And the axis names
+    assert (
+        "axis_name" in entry
+    ), f"Entry {key} of entry_dict missing axis_name field."
+    ax.set_xlabel(entry["axis_name"])
 
     # Plot the bar plot
-    width = (bins[1] - bins[0]) / 1.1
+    width = (bins[0][1] - bins[0][0]) / 1.1
     ax.bar(
-        bins[0:-1],
+        bins[0][0:-1],
         disruptivity,
         color="firebrick",
         yerr=error,
@@ -62,8 +78,8 @@ def subplot_disruptivity2d(
     ax: subplot_type,
     disruptivity: np.ndarray,
     error: np.ndarray,
-    x_bins: np.ndarray,
-    y_bins: np.ndarray,
+    bins: np.ndarray,
+    entry_dict: dict,
 ):
     """Creates a subplot of a 2D disruptivity map.
 
@@ -71,19 +87,46 @@ def subplot_disruptivity2d(
         ax (subplot_type): The matplotlib axes to plot on.
         disruptivity (np.ndarray): The disruptivity histogram of size (ny_bins-1, nx_bins-1).
         error (np.ndarray): The error histogram of size (ny_bins-1, nx_bins-1).
-        x_bins (np.ndarray): The x bin array of size (nx_bins).
-        y_bins (np.ndarray): The y bin array of size (ny_bins).
+        bins (list): List of the bin edges from the histogram.
+        entry_dict (list): List of the entries being plotted.
     """
+
+    # Asserts
+    assert len(entry_dict) == 2, "Too many entry_dict dimensions."
+
+    # Parse the dict
+    extent = []
+    axis_name_list = []
+    for key in entry_dict:
+        entry = entry_dict[key]
+
+        # Follow the order of the dictionary to find x and y
+        # Make sure the range is there
+        assert (
+            "range" in entry
+        ), f"Entry {key} of entry_dict missing range field."
+        extent.extend(entry["range"])
+
+        # And the axis names
+        assert (
+            "axis_name" in entry
+        ), f"Entry {key} of entry_dict missing axis_name field."
+        axis_name_list.append(entry["axis_name"])
 
     # Heatmap
     cax = ax.imshow(
         disruptivity.T,
         cmap="viridis",
         origin="lower",
-        interpolation="spline16",
+        # interpolation="spline16",
         aspect="auto",
-        extent=[x_bins[0], x_bins[-1], y_bins[0], y_bins[-1]],
+        extent=extent,
+        norm=colors.LogNorm(),
     )
+
+    # Axis Titles
+    ax.set_xlabel(axis_name_list[0])
+    ax.set_ylabel(axis_name_list[1])
 
     # Colorbar
     cbar = plt.colorbar(cax, label="Disruptivity ($s^{-1}$)")

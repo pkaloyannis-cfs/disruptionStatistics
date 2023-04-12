@@ -83,8 +83,8 @@ def test_compute_variable_time_array(gen_dataframe_and_indices):
         dataframe, denom_dd, indices, nbins
     )
 
-    # Fill the last time slice, since no dt can be computed for it
-    dt_array[-1, -1] += 1
+    # Fill the first time slice, since no dt can be computed for it
+    dt_array[0, 0] += 1
 
     assert (
         dt_array == denom_dd.statistic
@@ -102,8 +102,7 @@ def test_compute_variable_time_array(gen_dataframe_and_indices):
     )
     dataframe["elem1"][0] = 0
 
-    # Fill the last time slice, since no dt can be computed for it
-    dt_array[-1, -1] += 1
+    # Don't need to fill the first time slice since it is out of bounds.
 
     assert (dt_array == denom_dd.statistic).all(), "Incorrect Boundary Handling"
 
@@ -118,11 +117,12 @@ def test_compute_variable_time_array(gen_dataframe_and_indices):
         dataframe, denom_dd, indices, nbins
     )
 
-    # Fill the last time slice, since no dt can be computed for it
-    dt_array[-1, -1] += 1
+    # Fill the first time slice, since no dt can be computed for it
+    dt_array[0, 0] += 1
 
-    # Fill the [1,1] index corresponding to missing 1 in the summation.
-    dt_array[1, 1] += 1
+    # Fill the [2,2] index corresponding to missing 2 in the summation.
+    # that comes from the pulse number transition
+    dt_array[2, 2] += 1
 
     assert (
         dt_array == denom_dd.statistic
@@ -150,8 +150,10 @@ def test_compute_disruptivity(gen_dataframe_and_indices):
     entry_dict.pop("elem2")
 
     # Compute the fixed time 1D dirsuptivity
-    disrupt1d, errors1d, bin_edges_1d = disruptivity.compute_disruptivity(
-        dataframe, entry_dict, indices, indices_2, nbins=4, dt=dt
+    disrupt1d, errors1d, bin_edges_1d, entry_dict = (
+        disruptivity.compute_disruptivity(
+            dataframe, entry_dict, indices, indices_2, nbins=4, dt=dt
+        )
     )
 
     # Test
