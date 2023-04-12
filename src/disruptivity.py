@@ -108,19 +108,19 @@ def compute_variable_time(
         # test_array[entry]+=1
 
         # Check out of bounds
-        if dataframe_index + 1 == len(dataframe):
+        if dataframe_index - 1 < 0:
             continue
         # Check if last frame in the shot
         elif (
             dataframe["shot"][dataframe_index]
-            != dataframe["shot"][dataframe_index + 1]
+            != dataframe["shot"][dataframe_index - 1]
         ):
             continue
         # If all passes, compute dt and add it.
         else:
             dt_array[entry] += (
-                dataframe["time"][dataframe_index + 1]
-                - dataframe["time"][dataframe_index]
+                dataframe["time"][dataframe_index]
+                - dataframe["time"][dataframe_index - 1]
             )
 
     return dt_array
@@ -180,4 +180,4 @@ def compute_disruptivity(
         error = disruptivity * np.sqrt(1 / n_disrupt + 1 / n_total)
         error[~np.isfinite(error)] = 0
 
-    return disruptivity, error, num_dd.bin_edges
+    return disruptivity, error, num_dd.bin_edges, entry_dict

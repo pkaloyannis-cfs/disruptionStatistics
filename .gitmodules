@@ -1,0 +1,4 @@
+[submodule "disruption-warning-db-workflow"]
+	path = disruption-warning-db-workflow
+	url = git@github.com:crea-psfc/disruption-warning-db-workflow.git
+	branch = main
