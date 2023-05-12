@@ -65,16 +65,16 @@ def compute_variable_time(
     denom_indices: np.ndarray,
     nbins=25,
 ) -> np.ndarray:
-    """AI is creating summary for compute_variable_time.
+    """Compute the variable time array for variable time disruptivity.
 
     Args:
-        dataframe (pd.core.frame.DataFrame): [description]
-        denom_dd (scipy.stats._binned_statistic.BinnedStatisticddResult): [description]
-        denom_indices (np.ndarray): [description]
-        nbins (int, optional): [description]. Defaults to 25.
+        dataframe (pd.core.frame.DataFrame): The tokamak dataframe
+        denom_dd (scipy.stats._binned_statistic.BinnedStatisticddResult): The denominator histogram.
+        denom_indices (np.ndarray): The denominator indices.
+        nbins (int, optional): Number of histogram bins. Defaults to 25.
 
     Returns:
-        np.ndarray: [description]
+        np.ndarray: The net time spent in each histogram bin.
     """
 
     # Dimension Calculation
