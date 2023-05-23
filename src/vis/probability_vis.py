@@ -83,20 +83,3 @@ def subplot_disrupt_rate_over_time(
     ax.set_xlim(*xlim)
     ax.set_ylabel("Average Disruption Rate")
     ax.set_xlabel("TCV Style Shot Number")
-
-
-# ---- Intentional Disruptivity Rate ----
-
-
-def subplot_intentional_rate_over_time(
-    ax: subplot_type,
-    dataframe: pd.core.frame.DataFrame,
-    index_dict: dict,
-):
-    """AI is creating summary for subplot_intentional_rate_over_time.
-
-    Args:
-        ax (subplot_type): The matplotlib axes to plot on.
-        dataframe (pd.core.frame.DataFrame): The tokamak disruptivity dataframe.
-        index_dict (dict): The index dictionary for each index type.
-    """
