@@ -22,6 +22,7 @@ plugins:
   - search
   - mkdocstrings
 
+  # TODO: Clean this up.
   # # Notebook Source:
   # - mkdocs-jupyter:
   #     include: ["*.ipynb"]
