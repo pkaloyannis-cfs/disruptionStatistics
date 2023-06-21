@@ -7,7 +7,6 @@ from matplotlib import colors
 from vis.plot_helpers import *
 
 # TODO: Potentially fix the duplication of code between disruptivity1D and disruptivity2D when we introduce classes.
-# TODO: When we get the big dictionaries and classes going, we should fix axis titles.
 
 # ---- 1D Disruptivity ----
 
@@ -43,9 +42,6 @@ def subplot_disruptivity1d(
     # Get the limits and the axis name
     entry = entry_dict[list(entry_dict)[0]]
 
-    assert "range" in entry, f"Entry {key} of entry_dict missing range field."
-    ax.set_xlim(*entry["range"])
-
     # And the axis names
     assert (
         "axis_name" in entry
@@ -53,13 +49,13 @@ def subplot_disruptivity1d(
     ax.set_xlabel(entry["axis_name"])
 
     # Plot the bar plot
-    width = (bins[0][1] - bins[0][0]) / 1.1
+    width = bins[0][1] - bins[0][0]
     ax.bar(
-        bins[0][0:-1],
+        bins[0][0:-1] + width / 2,
         disruptivity,
         color="firebrick",
         yerr=error,
-        width=width,
+        width=width / 1.1,
         align="center",
         zorder=2,
         edgecolor=None,

@@ -181,3 +181,61 @@ def compute_disruptivity(
         error[~np.isfinite(error)] = 0
 
     return disruptivity, error, num_dd.bin_edges, entry_dict
+
+
+# ---- Indexing ----
+# Get the possible warning times
+def get_indices_disruptivity(
+    tokamak_config: dict,
+    dataframe: pd.core.frame.DataFrame,
+    index_dict: dict,
+    tau=0,
+    window=1,
+    shotlist=None,
+) -> dict:
+    """Adds the indices for detectable disruptivity to the index dictionary.
+
+    Args:
+        tokamak_config (dict): The Tokamak Config Dictionary.
+        dataframe (pd.core.frame.DataFrame): The Tokamak Dataframe.
+        index_dict (dict): The Index Dictionary.
+        tau (float)(optional): The tau class of the indices in ms. Default is 0 ms.
+        window (float)(optional): The window size for data selection on either side of the data in ms (tau-window, tau). Default is 1ms.
+        shotlist (list)(optional): The list of shot numbers to check for disruptions in. Default is None for no filtering.
+
+    Returns:
+        dict: The modified index dictionary.
+    """
+
+    # Find Viable Times for Detectable Disruptivity and Denominator.
+    time_until_disrupt_ms = dataframe.time_until_disrupt * 1000
+    tau_offset_times = time_until_disrupt_ms - tau
+    warning_times = np.logical_and(
+        tau_offset_times <= window, tau_offset_times >= 0
+    )
+
+    # TODO SHOT NUMBER FILTERING
+    disruptive_indices = index_dict["indices_flattop_disrupt_in_flattop"]
+    if shotlist is not None:
+        shotlist_bool = np.isin(dataframe.shot, shotlist)
+        disruptive_indices = dataframe[shotlist_bool].index
+
+    # Assert if there is a non-disrupted pulse in the shot list
+    assert (
+        True
+    ), f"Pulse(s) {None} in the shot list overlap with non-disruptive indices."
+
+    # Make sure they are part of our disruptions of interest
+    indices_n_disrupt = np.array(
+        np.intersect1d(
+            disruptive_indices,
+            dataframe.loc[warning_times].index,
+        )
+    )
+
+    # Create the denominator
+    indices_n_total = np.append(
+        index_dict["indices_flattop_no_disrupt"], disruptive_indices
+    )
+
+    return indices_n_disrupt, indices_n_total

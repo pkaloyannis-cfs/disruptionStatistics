@@ -31,6 +31,7 @@ def plot_subplot(
     subplot_func(ax, *args)
 
     # Save and return the figure.
-    fig.savefig(fpath, dpi=400, facecolor="w", bbox_inches="tight")
+    if fpath is not None:
+        fig.savefig(fpath, dpi=400, facecolor="w", bbox_inches="tight")
 
     return fig, ax

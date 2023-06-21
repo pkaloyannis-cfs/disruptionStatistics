@@ -5,8 +5,6 @@ CONFIG = {
     # Setup Information
     "name": "DIII-D",
     "filename_prefix": "d3d",
-    "disrupt_warning_time_ms": 350,
-    "disrupt_warning_window_ms": 12.5,
     "dataloc": "../data/d3d-db-220420.mat",
     "entry_dict": {
         "kappa": {
