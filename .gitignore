@@ -24,3 +24,4 @@ data/
 *.csv
 *.npy
 *.npz
+*.pkl

@@ -1,4 +1,12 @@
-"""vis/probability_vis.py hold code that is useful for generating disruption probability plots."""
+"""# Description
+
+This file contains computation routines for non-disruptivity related plots.
+
+Note: No function in here is unit tested.
+
+# Functions
+"""
+
 # Imports
 import numpy as np
 import matplotlib.pyplot as plt
@@ -30,12 +38,20 @@ def subplot_disrupt_rate_over_time(
     # 2. Find the total number of shots
     # 3. Mark disrupted shots with 1, non disrupted shots with 0 via intersection.
     flattop_disrupt_shot_number = dataframe.shot[
-        index_dict["indices_disrupt_time_in_flattop"]
+        index_dict["indices_disrupt_time"]
     ]
     shots = np.unique(dataframe.shot)
     shot_array_pre_avg = np.isin(shots, flattop_disrupt_shot_number).astype(
         np.int32
     )
+
+    # Loop through all the shots to check if they are intentional disruptions
+    # Not the most efficient but it works.
+    shots_no_intentional_pre_avg = np.copy(shot_array_pre_avg)
+    for i, shot in enumerate(shots):
+        shot_indices = dataframe[dataframe.shot == shot].index
+        if np.any(dataframe.intentional_disruption[shot_indices] == 1):
+            shots_no_intentional_pre_avg[i] = 0
 
     # Define the running average filter
     conv_filter = np.ones(filter_size) / filter_size
@@ -47,9 +63,13 @@ def subplot_disrupt_rate_over_time(
 
     # Compute the running average
     shot_array = np.convolve(shot_array_pre_avg, conv_filter, mode="same")
+    shots_no_intentional = np.convolve(
+        shots_no_intentional_pre_avg, conv_filter, mode="same"
+    )
 
     # Plot the running average and filter size
-    ax.plot(shot_num_TCV_style, shot_array, color="k")
+    ax.plot(shot_num_TCV_style, shot_array, "--", color="r")
+    ax.plot(shot_num_TCV_style, shots_no_intentional, color="k")
     ax.text(
         1000,
         0.865,
@@ -82,4 +102,8 @@ def subplot_disrupt_rate_over_time(
     ax.set_ylim(*ylim)
     ax.set_xlim(*xlim)
     ax.set_ylabel("Average Disruption Rate")
-    ax.set_xlabel("TCV Style Shot Number")
+    ax.set_xlabel("Shot Number")
+
+    # Set the X ticks to math the actual shot numbers.
+    ticked_shots = np.arange(*xlim, 2000)
+    ax.set_xticks(ticked_shots, shots[ticked_shots.astype(int)], rotation=45)
