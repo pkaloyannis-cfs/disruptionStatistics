@@ -32,7 +32,7 @@ CONFIG = {
             "axis_name": r"""$z_{error}$""",
         },
         "n_over_ncrit": {
-            "range": [-1, 2],
+            "range": [0, 2],
             "axis_name": r"""$n/n_{crit}$""",
         },
     },

@@ -26,7 +26,6 @@ def load_disruptions_mat(filepath: str):
     data.pop("__version__")
     data.pop("__globals__")
 
-    #! TODO: Discuss what these skipped keys are
     # Skipped Keys -- For DIII-D Data
     skipped_keys = ["iperr", "ipprog"]
 
@@ -53,6 +52,23 @@ def load_disruptions_mat(filepath: str):
 
     # Create the Pandas DataFrame
     data_df = pd.DataFrame.from_dict(data)
+
+    # Print Load Information
+    n_shots = np.unique(data_df.shot).shape[0]
+    n_shots_no_disrupt = np.unique(
+        data_df.shot[index_dict["indices_no_disrupt"]]
+    ).shape[0]
+    n_shots_disrupt = np.unique(
+        data_df.shot[index_dict["indices_disrupt"]]
+    ).shape[0]
+    assert n_shots_disrupt + n_shots_no_disrupt == n_shots, (
+        "Number of disrupts plus number of non disruptions does not equal the"
+        " total shot number"
+    )
+    print(
+        f"Total Shot Number: {n_shots}, Non-Disrupted Shots:"
+        f" {n_shots_no_disrupt}, Disrupted Shots: {n_shots_disrupt}"
+    )
 
     # Return
     return (data_df, index_dict)

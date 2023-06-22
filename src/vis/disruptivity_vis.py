@@ -109,15 +109,45 @@ def subplot_disruptivity2d(
         ), f"Entry {key} of entry_dict missing axis_name field."
         axis_name_list.append(entry["axis_name"])
 
-    # Heatmap
+    # The Normal Heatmap
     cax = ax.imshow(
         disruptivity.T,
         cmap="viridis",
         origin="lower",
-        # interpolation="spline16",
         aspect="auto",
         extent=extent,
         norm=colors.LogNorm(),
+    )
+
+    # Now the masked values
+    no_disruptions = np.ma.masked_where(
+        disruptivity.T != -2, np.ones(disruptivity.T.shape)
+    )
+    all_disruptions = np.ma.masked_where(
+        disruptivity.T != -3, np.ones(disruptivity.T.shape)
+    )
+
+    # The masked values
+    # When no disruptions, draw a black box
+    ax.imshow(
+        no_disruptions,
+        cmap="Accent",
+        origin="lower",
+        aspect="auto",
+        extent=extent,
+        vmin=0,
+        vmax=1,
+    )
+
+    # When all disruptions, draw a yellow box
+    ax.imshow(
+        all_disruptions,
+        cmap="Set1",
+        origin="lower",
+        aspect="auto",
+        extent=extent,
+        vmin=0,
+        vmax=1,
     )
 
     # Axis Titles
@@ -125,8 +155,70 @@ def subplot_disruptivity2d(
     ax.set_ylabel(axis_name_list[1])
 
     # Colorbar
-    cbar = plt.colorbar(cax, label="Disruptivity ($s^{-1}$)")
+    cbar = plt.colorbar(cax)
     cbar.ax.tick_params(labelsize="large")
     cbar.set_label(label="Disruptivity ($s^{-1}$)", size="large")
 
     # TODO: Is there some way to visualize the errors in this type of plot?
+
+
+# Data Processing Visualizations
+def plot_data_selection(
+    disruptivity: np.ndarray,
+    error: np.ndarray,
+    bins: np.ndarray,
+    entry_dict: dict,
+):
+    """Plots the results of the data selection routines.
+
+    Args:
+        disruptivity (np.ndarray): The disruptivity histogram of size (ny_bins-1, nx_bins-1).
+        error (np.ndarray): The error histogram of size (ny_bins-1, nx_bins-1).
+        bins (list): List of the bin edges from the histogram.
+        entry_dict (list): List of the entries being plotted.
+    """
+
+    # Create the plot
+    fig, ax = plt.subplots(1, 4, figsize=(4 * 4, 3))
+
+    # Parse the dict
+    extent = []
+    axis_name_list = []
+    for key in entry_dict:
+        entry = entry_dict[key]
+
+        # Follow the order of the dictionary to find x and y
+        # Make sure the range is there
+        assert (
+            "range" in entry
+        ), f"Entry {key} of entry_dict missing range field."
+        extent.extend(entry["range"])
+
+        # And the axis names
+        assert (
+            "axis_name" in entry
+        ), f"Entry {key} of entry_dict missing axis_name field."
+        axis_name_list.append(entry["axis_name"])
+
+    title_list = ["Full Data", "No Data", "None Disrupted", "All Disrupted"]
+    ans_list = [
+        disruptivity >= 0,
+        disruptivity == -1,
+        disruptivity == -2,
+        disruptivity == -3,
+    ]
+    for i, axis in enumerate(ax):
+        axis.imshow(
+            ans_list[i].T,
+            cmap="viridis",
+            origin="lower",
+            aspect="auto",
+            extent=extent,
+        )
+        axis.set_title(title_list[i])
+
+        # Axis Titles
+        axis.set_xlabel(axis_name_list[0])
+        axis.set_ylabel(axis_name_list[1])
+
+    return fig, ax
