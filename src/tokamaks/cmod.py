@@ -35,5 +35,6 @@ CONFIG = {
             "range": [0, 2],
             "axis_name": r"""$n/n_{crit}$""",
         },
+        "n_e": {"range": [0, 5e20], "axis_name": "$n_e$"},
     },
 }
