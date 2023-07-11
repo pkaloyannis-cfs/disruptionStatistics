@@ -16,6 +16,7 @@ This documentation page will be filled out more in the future. 😃
     docs/                           # Documentation Directory
     src/                            # Source Code Directory
         vis/                        # Visualization Package
+        tokamaks/                   # Tokamak Configuration Directory
     tests/                          # Unit Test Directory
     notebooks/                      # Jupyter Notebook Directory
 

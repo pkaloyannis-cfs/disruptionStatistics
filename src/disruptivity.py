@@ -242,7 +242,10 @@ def compute_continuous_time_bin(
     #
     # Thus we must check that the last entry and last
     # dataframe index number are one and the same.
-    last_entry = binnumber[:, 0] - 1
+    #
+    # Note: last_entry is set to an array of None so it
+    # can be filled with the first inbounds data later
+    last_entry = np.array(None)
     dt_integrator = 0
     last_dataframe_index = denom_indices[0] - 1
     last_shot = dataframe["shot"][last_dataframe_index + 1]
@@ -270,6 +273,12 @@ def compute_continuous_time_bin(
         # Check if the data is out of bounds
         if (entry < 0).any() or (entry > n_bins - 1).any():
             continue
+
+        # Set the initial last_entry memory to be the first entry
+        # that is in bounds. Otherwise if the first data entry is
+        # out of bounds this will throw an indexing error.
+        if (last_entry == None).any():
+            last_entry = entry
 
         # Get the dataframe entry for this histogram entry
         dataframe_index = denom_indices[i]

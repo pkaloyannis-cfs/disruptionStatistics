@@ -20,7 +20,7 @@ CONFIG = {
             "axis_name": "$l_i$",
         },
         "q95": {
-            "range": [2, 7.5],
+            "range": [1, 7.5],
             "axis_name": r"""$q_{95}$""",
         },
         "ip": {
