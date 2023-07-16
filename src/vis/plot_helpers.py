@@ -9,9 +9,7 @@ figure_subplot_type = tuple[figure_type, subplot_type]
 
 
 def plot_subplot(
-    fpath: str,
-    subplot_func: Callable,
-    args: list,
+    fpath: str, subplot_func: Callable, args: list, figsize=(4, 3)
 ) -> figure_subplot_type:
     """Wrapper that creates a simple plot using subplot routines and saves it.
 
@@ -19,13 +17,14 @@ def plot_subplot(
         fpath (str): The filepath for the saved plot.
         subplot_func The subplot function.
         args (list): List of arguments for the subplot funciton.
+        figsize (optional, tuple):   The size of the figure to make.
 
     Returns:
         fig (matplotlib.figure.Figure): Figure for plotting.
         ax (matplotlib.axes._subplots.AxesSubplot): Axes for plotting.
     """
     # Prep the figure.
-    fig, ax = plt.subplots(1, 1, figsize=(4, 3))
+    fig, ax = plt.subplots(1, 1, figsize=figsize)
 
     # Plot the subplot
     subplot_func(ax, *args)

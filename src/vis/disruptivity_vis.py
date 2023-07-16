@@ -157,7 +157,7 @@ def subplot_disruptivity2d(
     # Colorbar
     cbar = plt.colorbar(cax)
     cbar.ax.tick_params(labelsize="large")
-    cbar.set_label(label="Disruptivity ($s^{-1}$)", size="large")
+    cbar.set_label(label="Disruptivity ($s^{-1}$)")
 
     # TODO: Is there some way to visualize the errors in this type of plot?
 
