@@ -1,6 +1,6 @@
 # Disruption Statistics
 
-FILL WITH INTRO STUFF WHEN YOU ACTUALLY UNDERSTAND WHAT YOU ARE DOING. 
+Disruption Statistics is a codebase that aims to provide a tokamak agnostic computing framework for computing disruptibity values from time series data. Along with these computational routines, a plethora of plotting tools are available to conveniently visualize, save and share high quality figures. The repository is written in python with the intention of using it in jupyter notebooks or other similar apps.
 
 This work is the result of an EPFL Master's Project by Peter Kaloyannis in colaboration with MIT PSFC. The project was supervised by Prof. Ambrogio Fasoli (EPFL), Dr. Cristina Rea (PSFC), and Dr. Alessandro Pau (EPFL) and is built off the work of Nadezda Yalynskaya of IAEA.
 
